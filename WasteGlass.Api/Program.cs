@@ -5,11 +5,8 @@ using WasteGlass.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var port = Environment.GetEnvironmentVariable("PORT");
-if (!string.IsNullOrWhiteSpace(port))
-{
-    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-}
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 var connectionString = ConnectionStringValidator.GetRequiredPostgresConnectionString(builder.Configuration);
 
@@ -66,13 +63,30 @@ app.MapGet("/health", () => Results.Ok(new
     timestamp = DateTime.UtcNow
 }));
 
-using (var scope = app.Services.CreateScope())
+app.Lifetime.ApplicationStarted.Register(() =>
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var routeOptimizationService = scope.ServiceProvider.GetRequiredService<RouteOptimizationService>();
+    _ = Task.Run(async () =>
+    {
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var routeOptimizationService = scope.ServiceProvider.GetRequiredService<RouteOptimizationService>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>()
+                .CreateLogger("DatabaseStartup");
 
-    await dbContext.Database.MigrateAsync();
-    await DbSeeder.SeedAsync(dbContext, routeOptimizationService);
-}
+            logger.LogInformation("Starting database migration and seed.");
+            await dbContext.Database.MigrateAsync();
+            await DbSeeder.SeedAsync(dbContext, routeOptimizationService);
+            logger.LogInformation("Database migration and seed completed.");
+        }
+        catch (Exception exception)
+        {
+            var logger = app.Services.GetRequiredService<ILoggerFactory>()
+                .CreateLogger("DatabaseStartup");
+            logger.LogError(exception, "Database migration or seed failed.");
+        }
+    });
+});
 
 await app.RunAsync();
