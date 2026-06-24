@@ -1,0 +1,33 @@
+# Flutter / Dart
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+
+# Android / Gradle
+**/.gradle/
+**/local.properties
+**/captures/
+**/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+*.apk
+*.aab
+
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Secrets / local config
+.env
+*.Development.json
