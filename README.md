@@ -94,12 +94,4 @@ Build APK:
 flutter build apk --release
 ```
 
-## Deployment Reminder
 
-Before submitting:
-
-- Deploy the .NET API to Render, Railway, Azure, or similar.
-- Set `SUPABASE_POSTGRES_CONNECTION` in the hosting provider.
-- Update Flutter `ApiConstants.baseUrl` to the hosted API URL.
-- Build a fresh release APK after changing the URL.
-- Record the complete flow from route load to barcode scan, collection, report, and sync.
