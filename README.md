@@ -1,7 +1,5 @@
 # Waste Glass Collection App
 
-Full-stack intern assignment solution with:
-
 - Flutter Android app
 - .NET 8 Web API backend
 - Supabase PostgreSQL database through Entity Framework Core
